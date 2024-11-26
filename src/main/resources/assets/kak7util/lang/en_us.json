@@ -1,0 +1,22 @@
+{
+  "text.autoconfig.kak7Util.title": "kak7 Util Settings",
+  "text.autoconfig.kak7Util.option.triggerbotEnabled.@PrefixText": "TriggerBot Settings",
+  "text.autoconfig.kak7Util.option.triggerbotEnabled": "Enable TriggerBot",
+  "text.autoconfig.kak7Util.option.doSound": "Enable sounds when turn on/off",
+  "text.autoconfig.kak7Util.option.criticalAttacksOnly": "Use only critical attacks",
+  "text.autoconfig.kak7Util.option.doConsoleLog": "Do console log when on/off",
+  "text.autoconfig.kak7Util.option.avoidAntiCheat": "Turn on to avoid anticheats",
+  "text.autoconfig.kak7Util.option.autoParkourEnabled": "Enable AutoParkour",
+  "text.autoconfig.kak7Util.option.autoParkourEnabled.@PrefixText": "AutoParkour Settings",
+  "text.autoconfig.kak7Util.option.useHotKeyMode": "Use hot key mode",
+  "text.autoconfig.kak7Util.option.useSlimeGlitch": "Use slime glitch while autoparkour",
+  "text.autoconfig.kak7Util.option.renderSwitcherUI": "Render switcher UI",
+  "text.autoconfig.kak7Util.option.color": "Color of switcher UI",
+  "text.autoconfig.kak7Util.option.renderCrosshairHighlight": "Render crosshair highlight",
+  "text.autoconfig.kak7Util.option.renderHotbarHighight": "Render hotbar highlight",
+  "text.autoconfig.kak7Util.option.useFastGamemodeSwitcher": "Fast gamemode switcher",
+
+  "category.kak7util.kak7util": "kak7Util HotKeys",
+  "key.kak7Util.triggerbotkey": "Rigger bob",
+  "key.kak7Util.autoparkourkey": "Jumper Car"
+}
