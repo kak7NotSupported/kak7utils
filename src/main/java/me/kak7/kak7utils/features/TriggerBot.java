@@ -36,7 +36,7 @@ public class TriggerBot {
 
     private void playSound(SoundEvent sound) {
         if (!(config.isDoSound())) return;
-        mc.player.playSound(sound, SoundCategory.RECORDS, 1.0F, 1.0F);
+        mc.player.playSound(sound, 1.0F, 1.0F);
     }
 
     private void registerChecks() {
