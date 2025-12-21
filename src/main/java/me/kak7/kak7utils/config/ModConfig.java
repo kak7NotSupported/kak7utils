@@ -33,6 +33,10 @@ public class ModConfig implements ConfigData, ModMenuApi {
     boolean useSlimeGlitch = true;
     boolean useFastGamemodeSwitcher = true;
 
+    @ConfigEntry.Gui.PrefixText
+    boolean fastPlaceEnabled = false;
+    boolean fixedItemUseCooldown2 = false;
+
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         // todo return a screen

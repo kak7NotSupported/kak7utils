@@ -15,6 +15,9 @@
   "text.autoconfig.kak7Util.option.renderCrosshairHighlight": "Render crosshair highlight",
   "text.autoconfig.kak7Util.option.renderHotbarHighight": "Render hotbar highlight",
   "text.autoconfig.kak7Util.option.useFastGamemodeSwitcher": "Fast gamemode switcher",
+  "text.autoconfig.kak7Util.option.fastPlaceEnabled.@PrefixText": "Fast Place Settings",
+  "text.autoconfig.kak7Util.option.fastPlaceEnabled": "Enable fast place (Alt)",
+  "text.autoconfig.kak7Util.option.fixedItemUseCooldown2": "Item use cooldown = 2 ticks",
 
   "category.kak7util.kak7util": "kak7Util HotKeys",
   "key.kak7Util.triggerbotkey": "Rigger bob",
