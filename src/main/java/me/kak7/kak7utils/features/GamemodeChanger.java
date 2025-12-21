@@ -22,11 +22,11 @@ public class GamemodeChanger {
             if (keyBindingGamemodeChanger.wasPressed() & config.isUseFastGamemodeSwitcher()) {
 
                 if (!MinecraftClient.getInstance().player.isSpectator()) {
-                    MinecraftClient.getInstance().player.networkHandler.sendCommand("gamemode spectator");
+                    MinecraftClient.getInstance().player.networkHandler.sendChatCommand("gamemode spectator");
                 } else {
                     ClientPlayerEntity entity = MinecraftClient.getInstance().player;
                     GameMode gamemode = MinecraftClient.getInstance().interactionManager.getPreviousGameMode();
-                    entity.networkHandler.sendCommand("gamemode " + MoreObjects.firstNonNull(gamemode, GameMode.CREATIVE).getName());
+                    entity.networkHandler.sendChatCommand("gamemode " + MoreObjects.firstNonNull(gamemode, GameMode.CREATIVE).getId());
                 }
             }
         });

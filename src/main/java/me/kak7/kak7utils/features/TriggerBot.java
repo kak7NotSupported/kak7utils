@@ -95,11 +95,15 @@ public class TriggerBot {
 
             // highlight crosshair
             if (config.isRenderCrosshairHighlight()) {
-                drawContext.drawBorder(screenWidth / 2 - 3, screenHeight / 2 - 3, 5, 5, config.getColor());
+                int crosshairX = screenWidth / 2 - 3;
+                int crosshairY = screenHeight / 2 - 3;
+                int crosshairSize = 5;
+                int color = config.getColor();
+                drawContext.drawHorizontalLine(crosshairX, crosshairX + crosshairSize - 1, crosshairY, color);
+                drawContext.drawHorizontalLine(crosshairX, crosshairX + crosshairSize - 1, crosshairY + crosshairSize - 1, color);
+                drawContext.drawVerticalLine(crosshairX, crosshairY, crosshairY + crosshairSize - 1, color);
+                drawContext.drawVerticalLine(crosshairX + crosshairSize - 1, crosshairY, crosshairY + crosshairSize - 1, color);
             }
-
-
-            drawContext.draw();
         });
 
     }
