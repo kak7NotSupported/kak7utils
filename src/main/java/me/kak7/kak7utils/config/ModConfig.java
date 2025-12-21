@@ -1,17 +1,14 @@
 package me.kak7.kak7utils.config;
 
-import com.terraformersmc.modmenu.api.ConfigScreenFactory;
-import com.terraformersmc.modmenu.api.ModMenuApi;
 import lombok.Getter;
 import lombok.Setter;
-import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
 @Getter
 @Config(name = "kak7Util")
-public class ModConfig implements ConfigData, ModMenuApi {
+public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.PrefixText
     @Setter
@@ -36,10 +33,4 @@ public class ModConfig implements ConfigData, ModMenuApi {
     @ConfigEntry.Gui.PrefixText
     boolean fastPlaceEnabled = false;
     boolean fixedItemUseCooldown2 = false;
-
-    @Override
-    public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        // todo return a screen
-        return parent -> AutoConfig.getConfigScreen(ModConfig.class, parent).get();
-    }
 }
