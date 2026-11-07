@@ -5,17 +5,17 @@ import me.kak7.kak7utils.config.ModConfig;
 import me.kak7.kak7utils.mixin.MinecraftClientAccessor;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 
 public class FastUse {
-    private final MinecraftClient mc = MinecraftClient.getInstance();
-    private final KeyBinding keyBindingAutoParkour = Hotkeys.getKeyBindingAutoParkour();
+    private final Minecraft mc = Minecraft.getInstance();
+    private final KeyMapping keyBindingAutoParkour = Hotkeys.getKeyBindingAutoParkour();
     private final ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
 
     private FastUse() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (mc.player == null || !config.isFastPlaceEnabled() || !keyBindingAutoParkour.isPressed()) {
+            if (mc.player == null || !config.isFastPlaceEnabled() || !keyBindingAutoParkour.isDown()) {
                 return;
             }
             if (config.isFixedItemUseCooldown2()) {

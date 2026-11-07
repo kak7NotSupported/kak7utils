@@ -4,13 +4,13 @@ import me.kak7.kak7utils.Hotkeys;
 import me.kak7.kak7utils.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Hand;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +21,8 @@ public class TriggerBot {
 
     private final ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
-    private final KeyBinding keyBindingTrigger = Hotkeys.getKeyBindingTrigger();
+    private final Minecraft mc = Minecraft.getInstance();
+    private final KeyMapping keyBindingTrigger = Hotkeys.getKeyBindingTrigger();
 
     public static void initialize() {
         new TriggerBot();
@@ -43,19 +43,19 @@ public class TriggerBot {
 
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (keyBindingTrigger.wasPressed()) {
+            if (keyBindingTrigger.consumeClick()) {
                 config.setTriggerbotEnabled(!config.isTriggerbotEnabled());
-                playSound(config.isTriggerbotEnabled() ? SoundEvents.BLOCK_NOTE_BLOCK_FLUTE.value() : SoundEvents.BLOCK_NOTE_BLOCK_GUITAR.value());
+                playSound(config.isTriggerbotEnabled() ? SoundEvents.NOTE_BLOCK_FLUTE.value() : SoundEvents.NOTE_BLOCK_GUITAR.value());
             }
 
-            if (config.isTriggerbotEnabled() && mc.player != null && mc.interactionManager != null) {
+            if (config.isTriggerbotEnabled() && mc.player != null && mc.gameMode != null) {
                 mainChecks();
             }
         });
     }
 
     private void mainChecks() {
-        if (mc.player.getAttackCooldownProgress(0.0F) == 1.0F && mc.targetedEntity != null) {
+        if (mc.player.getAttackStrengthScale(0.0F) == 1.0F && mc.crosshairPickEntity != null) {
             if (config.isAvoidAntiCheat()) {
                 try {
                     // todo сделать что-то с таймингами, не бьет по радиусу (иногда)
@@ -70,19 +70,19 @@ public class TriggerBot {
     }
 
     private void attack() {
-        mc.interactionManager.attackEntity(mc.player, mc.targetedEntity);
-        mc.player.swingHand(Hand.MAIN_HAND);
+        mc.gameMode.attack(mc.player, mc.crosshairPickEntity);
+        mc.player.swing(InteractionHand.MAIN_HAND);
     }
 
 
     private void renderSwitcherUI() {
 
-        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("kak7util", "triggerbot_switcher"), (graphics, deltaTracker) -> {
             // when renderui is disabled and triggerbot is disabled return
             if (!config.isRenderSwitcherUI() || !config.isTriggerbotEnabled()) return;
 
-            int screenWidth = mc.getWindow().getScaledWidth();
-            int screenHeight = mc.getWindow().getScaledHeight();
+            int screenWidth = mc.getWindow().getGuiScaledWidth();
+            int screenHeight = mc.getWindow().getGuiScaledHeight();
 
             // get hotbar position
             int hotbarY = screenHeight - 22;
@@ -90,7 +90,7 @@ public class TriggerBot {
 
             // draw hotbar
             if (config.isRenderHotbarHighight()) {
-                drawContext.drawHorizontalLine(hotbarX, hotbarX + 181, hotbarY, config.getColor());
+                graphics.horizontalLine(hotbarX, hotbarX + 181, hotbarY, config.getColor());
             }
 
             // highlight crosshair
@@ -99,10 +99,10 @@ public class TriggerBot {
                 int crosshairY = screenHeight / 2 - 3;
                 int crosshairSize = 5;
                 int color = config.getColor();
-                drawContext.drawHorizontalLine(crosshairX, crosshairX + crosshairSize - 1, crosshairY, color);
-                drawContext.drawHorizontalLine(crosshairX, crosshairX + crosshairSize - 1, crosshairY + crosshairSize - 1, color);
-                drawContext.drawVerticalLine(crosshairX, crosshairY, crosshairY + crosshairSize - 1, color);
-                drawContext.drawVerticalLine(crosshairX + crosshairSize - 1, crosshairY, crosshairY + crosshairSize - 1, color);
+                graphics.horizontalLine(crosshairX, crosshairX + crosshairSize - 1, crosshairY, color);
+                graphics.horizontalLine(crosshairX, crosshairX + crosshairSize - 1, crosshairY + crosshairSize - 1, color);
+                graphics.verticalLine(crosshairX, crosshairY, crosshairY + crosshairSize - 1, color);
+                graphics.verticalLine(crosshairX + crosshairSize - 1, crosshairY, crosshairY + crosshairSize - 1, color);
             }
         });
 
@@ -111,7 +111,7 @@ public class TriggerBot {
     @Deprecated
     public boolean canDoCrit() {
         int beforeY = (int) mc.player.getY();
-        return !mc.player.isTouchingWater() && !mc.player.isInLava() && !mc.player.isOnGround() && mc.player.getY() <= beforeY;
+        return !mc.player.isInWater() && !mc.player.isInLava() && !mc.player.onGround() && mc.player.getY() <= beforeY;
     }
 
 

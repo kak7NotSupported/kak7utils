@@ -4,22 +4,22 @@ import me.kak7.kak7utils.Hotkeys;
 import me.kak7.kak7utils.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 
 public class AutoParkour {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
     private final ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
     private volatile boolean isSneakingActivated = false;
 
     private AutoParkour() {
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
-            if (mc.world != null && shouldTriggerAutoParkour()) {
+            if (mc.level != null && shouldTriggerAutoParkour()) {
                 attemptParkour();
             }
         });
@@ -31,25 +31,25 @@ public class AutoParkour {
     }
 
     private boolean shouldTriggerAutoParkour() {
-        return (!config.isUseHotKeyMode() || Hotkeys.getKeyBindingAutoParkour().isPressed()) && mc.player != null;
+        return (!config.isUseHotKeyMode() || Hotkeys.getKeyBindingAutoParkour().isDown()) && mc.player != null;
     }
 
     private void attemptParkour() {
         checkAndPerformSlimeGlitch();
         if (isParkourPossible()) {
-            mc.player.jump();
+            mc.player.jumpFromGround();
         }
 
     }
 
     private boolean isParkourPossible() {
-        var jumpKey = mc.options.jumpKey;
-        if (!mc.player.isOnGround() || mc.player.isSneaking() || jumpKey.isPressed()) {
+        var jumpKey = mc.options.keyJump;
+        if (!mc.player.onGround() || mc.player.isShiftKeyDown() || jumpKey.isDown()) {
             return false;
         }
 
-        Box playerBox = mc.player.getBoundingBox().offset(0, -0.5, 0).expand(-0.001, 0, -0.001);
-        boolean isPathBlocked = mc.world.getBlockCollisions(mc.player, playerBox).iterator().hasNext();
+        AABB playerBox = mc.player.getBoundingBox().move(0, -0.5, 0).inflate(-0.001, 0, -0.001);
+        boolean isPathBlocked = mc.level.getBlockCollisions(mc.player, playerBox).iterator().hasNext();
         return !isPathBlocked;
     }
 
@@ -60,11 +60,11 @@ public class AutoParkour {
         // do something
     });*/
     private void checkAndPerformSlimeGlitch() {
-        if (!config.isUseSlimeGlitch() || mc.player == null || mc.world == null) return;
+        if (!config.isUseSlimeGlitch() || mc.player == null || mc.level == null) return;
 
         if (isPlayerCloseToSlimeBelow() && !isSneakingActivated) {
             isSneakingActivated = true;
-            mc.options.sneakKey.setPressed(true);
+            mc.options.keyShift.setDown(true);
 
             if (!isSneakingActivated) return;
             new Thread(() -> {
@@ -73,14 +73,14 @@ public class AutoParkour {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                mc.options.sneakKey.setPressed(false);
+                mc.options.keyShift.setDown(false);
                 isSneakingActivated = false;
             }).start();
         }
     }
 
     private boolean isPlayerCloseToSlimeBelow() {
-        Block supportingBlock = mc.world.getBlockState(mc.world.findSupportingBlockPos(mc.player, mc.player.getBoundingBox().offset(0, -1, 0).expand(0, 0, 0)).orElse(new BlockPos(0, -1, 0))).getBlock();
+        Block supportingBlock = mc.level.getBlockState(mc.level.findSupportingBlock(mc.player, mc.player.getBoundingBox().move(0, -1, 0).inflate(0, 0, 0)).orElse(new BlockPos(0, -1, 0))).getBlock();
         return supportingBlock == Blocks.SLIME_BLOCK;
     }
 
