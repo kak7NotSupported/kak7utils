@@ -2,6 +2,7 @@ package me.kak7.kak7utils.features;
 
 import me.kak7.kak7utils.Hotkeys;
 import me.kak7.kak7utils.config.ModConfig;
+import me.kak7.kak7utils.mixin.LocalPlayerAccessor;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
@@ -9,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class AutoParkour {
 
@@ -37,7 +39,8 @@ public class AutoParkour {
     private void attemptParkour() {
         checkAndPerformSlimeGlitch();
         if (isParkourPossible()) {
-            mc.player.jumpFromGround();
+            // jump through the regular input (like vanilla auto-jump) instead of calling jumpFromGround() directly
+            ((LocalPlayerAccessor) mc.player).kak7utils$setAutoJumpTime(1);
         }
 
     }
@@ -48,9 +51,22 @@ public class AutoParkour {
             return false;
         }
 
-        AABB playerBox = mc.player.getBoundingBox().move(0, -0.5, 0).inflate(-0.001, 0, -0.001);
-        boolean isPathBlocked = mc.level.getBlockCollisions(mc.player, playerBox).iterator().hasNext();
-        return !isPathBlocked;
+        AABB box = mc.player.getBoundingBox().inflate(-0.001, 0, -0.001);
+
+        // still something right under the feet -> not at the edge yet
+        if (hasCollision(box.move(0, -0.01, 0))) {
+            return false;
+        }
+
+        // something to step down onto (slab, lower floor) where we'll be next tick -> walk down, no jump.
+        // Checked at the next-tick position, not the current one: thin bits sticking out under the edge
+        // (e.g. open trapdoors around a daylight detector) used to count as floor and block the jump.
+        Vec3 velocity = mc.player.getDeltaMovement();
+        return !hasCollision(box.move(velocity.x, -0.5, velocity.z));
+    }
+
+    private boolean hasCollision(AABB box) {
+        return mc.level.getBlockCollisions(mc.player, box).iterator().hasNext();
     }
 
 
